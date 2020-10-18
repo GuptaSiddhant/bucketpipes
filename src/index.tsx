@@ -10,7 +10,8 @@ import {
   useBitbucket,
   BitbucketContext,
 } from "./bitbucket";
-import { APIClient, Schema } from "./bitbucket/types";
+import { APIClient } from "./bitbucket/client/types";
+import { Schema } from "./bitbucket/types";
 
 const localStorageKey = "bitbucketToken";
 
@@ -25,7 +26,7 @@ const Root = () => {
     () => ({
       user: null,
       isAuth: false,
-      bitbucket: undefined,
+      bitbucket: {} as APIClient,
     }),
     []
   );
@@ -34,6 +35,10 @@ const Root = () => {
 
   const login = () => {
     const key = "VfZarR4QDMLH8pXVDP",
+      // redirectUrl =
+      //   process.env.NODE_ENV === "development"
+      //     ? "&redirect_url=http://localhost:3000"
+      //     : "",
       url = `https://bitbucket.org/site/oauth2/authorize?client_id=${key}&response_type=token`;
     window.location.href = url;
   };
@@ -46,9 +51,8 @@ const Root = () => {
 
   const authenticate = React.useCallback(
     async (token: string) => {
-      const client = new Bitbucket({ auth: { token } }) as APIClient;
+      const client = new Bitbucket({ auth: { token } });
       const { status, data } = await client.users.getAuthedUser({});
-      console.log({ status, data });
       if (status === 200) {
         localStorage.setItem(localStorageKey, token);
         setState({

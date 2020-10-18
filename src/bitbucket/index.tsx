@@ -6,7 +6,8 @@ import paginationPlugin from "./plugins/pagination";
 import registerApiEndpointsPlugin from "./plugins/register-api-endpoints";
 import registerEndpointsPlugin from "./plugins/register-endpoints";
 import validateRequestPlugin from "./plugins/validate-request";
-import { APIClient, Schema } from "./types";
+import { APIClient } from "./client/types";
+import { Schema } from "./types";
 
 const Plugins = [
   noticePlugin,
@@ -19,15 +20,14 @@ const Plugins = [
 
 export const Bitbucket = Client.plugins(Plugins);
 
-type BitbucketType = APIClient | undefined;
 export interface BitbucketContext {
-  bitbucket: BitbucketType;
+  bitbucket: APIClient;
   logout: () => void;
   user: Schema.Account | null;
 }
 
 export const Context = React.createContext<BitbucketContext>({
-  bitbucket: undefined,
+  bitbucket: {} as APIClient,
   logout: () => {},
   user: null,
 });

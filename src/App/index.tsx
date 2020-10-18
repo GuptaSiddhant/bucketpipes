@@ -3,6 +3,7 @@ import React from "react";
 // import { Schema } from "../bitbucket/types";
 import "./App.css";
 import NavBar from "./NavBar";
+import Repositories from "../pages/Repositories";
 
 function App() {
   // const { logout, user } = useBitbucket();
@@ -10,6 +11,7 @@ function App() {
   return (
     <div className="App">
       <NavBar />
+      <Repositories />
     </div>
   );
 }
