@@ -1,14 +1,13 @@
 import React from "react";
-import { Bitbucket } from "bitbucket";
+import { Bitbucket } from "../bitbucket";
 import "./App.css";
 
-const clientOptions = {
-  auth: {
-    username: "fasiddhant",
-    password: "wFNTkAPwCZUdmGgjQKjC",
-  },
-};
-const bitbucket = new Bitbucket(clientOptions),
+const bitbucket = new Bitbucket({
+    auth: {
+      username: "fasiddhant",
+      password: "wFNTkAPwCZUdmGgjQKjC",
+    },
+  }),
   workspace = "fasolutions-ondemand",
   repo_slug = "fa-admin-console-app",
   log = (text = "") => ({ data }: any) => console.log(text, data);
