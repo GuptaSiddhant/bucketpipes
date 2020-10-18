@@ -3,10 +3,14 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
+import { ReactQueryDevtools } from "react-query-devtools";
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    {process.env.NODE_ENV !== "production" && (
+      <ReactQueryDevtools initialIsOpen={false} />
+    )}
   </React.StrictMode>,
   document.getElementById("root")
 );
