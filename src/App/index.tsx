@@ -1,9 +1,9 @@
 import React from "react";
-// import { useBitbucket } from "../bitbucket";
-// import { Schema } from "../bitbucket/types";
+import { Switch, Route, Redirect } from "react-router-dom";
 import "./App.css";
 import NavBar from "./NavBar";
 import Repositories from "../pages/Repositories";
+import Repository from "../pages/Repository";
 
 function App() {
   // const { logout, user } = useBitbucket();
@@ -11,7 +11,17 @@ function App() {
   return (
     <div className="App">
       <NavBar />
-      <Repositories />
+      <Switch>
+        <Route path="/:workspace/:repo_slug/pipelines">
+          <Repository />
+        </Route>
+        <Route path="/repositories">
+          <Repositories />
+        </Route>
+        <Route exact path="/">
+          <Redirect to="/repositories" />
+        </Route>
+      </Switch>
     </div>
   );
 }
