@@ -1,46 +1,47 @@
-import nodeFetch from 'node-fetch'
-import { HTTPError } from '../error'
+import nodeFetch from "node-fetch";
+import { HTTPError } from "../error";
 
-type FetchResponse = import('node-fetch').Response
-type Endpoint = import('./types').Endpoint
-type Headers = import('./types').Headers
-type Response<T> = import('./types').Response<T>
+type FetchResponse = import("node-fetch").Response;
+type Endpoint = import("./types").Endpoint;
+type Headers = import("./types").Headers;
+type Response<T> = import("./types").Response<T>;
 
 function getData(response: FetchResponse): Promise<any> {
-  const contentType = response.headers.get('content-type')
+  const contentType = response.headers.get("content-type");
 
-  if (contentType!.includes('application/json')) {
-    return response.json()
+  if (contentType!.includes("application/json")) {
+    return response.json();
   }
 
   if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
-    return response.text()
+    return response.text();
   }
 
-  return response.arrayBuffer()
+  return response.arrayBuffer();
 }
 
 export function fetchWrapper(
   requestOptions: ReturnType<Endpoint>
 ): Promise<Response<any>> {
-  const { method, url, headers, body, request } = requestOptions
+  const { method, url, headers, body, request } = requestOptions;
 
-  const options = Object.assign({ method, body, headers }, request)
+  const options = Object.assign({ method, body, headers }, request);
 
-  let responseStatus: number
-  let responseUrl: string
+  let responseStatus: number;
+  let responseUrl: string;
 
-  const responseHeaders: Headers = {}
+  const responseHeaders: Headers = {};
 
-  const fetch = request!.fetch ?? nodeFetch
+  const fetch = request!.fetch ?? nodeFetch;
 
   return fetch(url, options)
     .then((response: FetchResponse): any => {
-      responseStatus = response.status
-      responseUrl = response.url
+      responseStatus = response.status;
+      responseUrl = response.url;
 
+      // @ts-ignore
       for (const [field, value] of response.headers) {
-        responseHeaders[field] = value
+        responseHeaders[field] = value;
       }
 
       if (response.status >= 400 || [304].includes(response.status)) {
@@ -49,11 +50,11 @@ export function fetchWrapper(
             error,
             headers: responseHeaders,
             request: requestOptions,
-          })
-        })
+          });
+        });
       }
 
-      return getData(response)
+      return getData(response);
     })
     .then(
       (data): Response<any> => ({
@@ -65,12 +66,12 @@ export function fetchWrapper(
     )
     .catch((error): any => {
       if (error instanceof HTTPError) {
-        throw error
+        throw error;
       }
 
       throw new HTTPError(error.message, 500, {
         headers: responseHeaders,
         request: requestOptions,
-      })
-    })
+      });
+    });
 }

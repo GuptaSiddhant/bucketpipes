@@ -4,6 +4,7 @@ import "./App.css";
 import NavBar from "./NavBar";
 import Repositories from "../pages/Repositories";
 import Repository from "../pages/Repository";
+import { RouteWithSubRoutes } from "./routes";
 
 function App() {
   // const { logout, user } = useBitbucket();
@@ -11,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <NavBar />
-      <Switch>
+      {/* <Switch>
         <Route path="/:workspace/:repo_slug/pipelines">
           <Repository />
         </Route>
@@ -21,7 +22,9 @@ function App() {
         <Route exact path="/">
           <Redirect to="/repositories" />
         </Route>
-      </Switch>
+      </Switch> */}
+
+      <RouteWithSubRoutes />
     </div>
   );
 }
