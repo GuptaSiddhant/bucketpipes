@@ -1,7 +1,7 @@
 import React from "react";
 import { usePaginatedQuery } from "react-query";
 import { Link } from "react-router-dom";
-import Select from "react-select";
+import { HeaderBar } from "../components";
 import { useBitbucket } from "../bitbucket";
 import { Schema } from "../bitbucket/types";
 
@@ -79,11 +79,11 @@ const Workspaces = () => {
     <div>Loading...</div>
   ) : (
     <div>
-      {selectOptions.length > 1 && (
+      <HeaderBar caption={label} title="Repositories" />
+      {/* {selectOptions.length > 1 && (
         <Select options={selectOptions} onChange={setWorkspace as any} />
-      )}
+      )} */}
       <div>
-        <h1>{label}</h1>
         <Repositories workspace={value} />
       </div>
     </div>
