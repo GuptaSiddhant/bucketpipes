@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import {
   IconArrowLeft,
-  IconSettings,
+  // IconSettings,
   IconFilter,
   IconLogout,
 } from "tabler-icons";
