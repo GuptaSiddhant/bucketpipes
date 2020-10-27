@@ -18,23 +18,28 @@ const colors = {
 const shadows = {
   none: `none`,
   large: `0 4px 16px 0 rgba(0,0,0,0.10)`,
-  medium: `0 2px 8px 0 rgba(0,0,0,0.10)`,
-  small: `0 1px 4px 0 rgba(0,0,0,0.10)`,
+  medium: `0 2px 8px 0 rgba(0,0,0,0.20)`,
+  small: `0 1px 4px 0 rgba(0,0,0,0.20)`,
 };
 
 const fonts = {
   body: `400 16px/20px Metropolis`,
   bodyLink: `500 16px/20px Metropolis`,
   note: `400 12px/16px Metropolis`,
-  subtext: `500 12px/16px Metropolis`,
+  subtext: `500 14px/16px Metropolis`,
   title: `500 20px/24px Metropolis`,
   code: `400 12px/16px FiraCode`,
+};
+
+const css = {
+  truncateText: `max-width: calc(100%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`,
 };
 
 export const theme = {
   colors,
   shadows,
   fonts,
+  css,
 };
 
 export { default as styled } from "styled-components";

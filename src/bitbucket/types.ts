@@ -659,7 +659,7 @@ export namespace Schema {
     [k: string]: unknown;
   };
   export type PipelineStepState = Object & {
-    [k: string]: unknown;
+    [k: string]: any;
   };
   export type PipelineVariable = Object & {
     key?: string;
@@ -682,7 +682,8 @@ export namespace Schema {
     [k: string]: unknown;
   };
   export type PipelineState = Object & {
-    [k: string]: unknown;
+    [k: string]: any;
+    name: string;
   };
   export type PipelineTrigger = Object & {
     [k: string]: unknown;
