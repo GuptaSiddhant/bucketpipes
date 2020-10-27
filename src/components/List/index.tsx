@@ -1,17 +1,21 @@
 import React from "react";
-import { styled, theme } from "../../theme";
-import { ListItem } from "./Item";
+import { styled } from "../../theme";
+import { ListItem } from "./ListItem";
 
 interface List {
+  isLoading?: boolean;
   items: ListItem[];
 }
 
 const StyledList = styled.ul`
   list-style: none;
+  margin-left: 0;
+  padding-left: 0;
 `;
 
 const List = (props: List) => {
-  const { items } = props;
+  const { items, isLoading } = props;
+  if (isLoading) return <div>Loading...</div>;
   return (
     <StyledList>
       {items.map((item) => (
@@ -21,4 +25,4 @@ const List = (props: List) => {
   );
 };
 
-export { List };
+export { List, StyledList, ListItem };

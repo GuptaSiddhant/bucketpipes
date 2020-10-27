@@ -1,7 +1,7 @@
 import React from "react";
 import { usePaginatedQuery } from "react-query";
-import { Link } from "react-router-dom";
-import { HeaderBar } from "../components";
+import * as time from "timeago.js";
+import { HeaderBar, List, Image } from "../components";
 import { useBitbucket } from "../bitbucket";
 import { Schema } from "../bitbucket/types";
 
@@ -24,26 +24,30 @@ const Repositories = ({ workspace }: { workspace: string }) => {
     bitbucket.repositories.list({
       workspace,
       page,
-      pagelen: 20,
+      pagelen: 50,
       sort: "-updated_on",
     })
   );
   const repositories = data?.data?.values || [];
-  console.log(repositories[0]);
 
-  return isLoading ? (
-    <div>Loading...</div>
-  ) : (
-    <ul>
-      {repositories.map((repository) => (
-        <li key={repository.uuid}>
-          <Link to={`/${workspace}/${repository.uuid}/pipelines`}>
-            {repository.name}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
+  const getLastUpdated = ({ updated_on }: Schema.Repository) =>
+    updated_on ? time.format(new Date(updated_on)) : "";
+
+  const items: List["items"] = repositories.map((repository, index) => ({
+    uid: repository.uuid || index.toString(),
+    primaryText: repository.name || "",
+    secondaryText:
+      repository.project?.name + " - " + getLastUpdated(repository),
+    link: `/${repository.full_name}/pipelines`,
+    leadingIcon: (
+      <Image
+        src={repository.links?.avatar?.href || ""}
+        title={repository.name}
+      />
+    ),
+  }));
+
+  return <List items={items} isLoading={isLoading} />;
 };
 
 const Workspaces = () => {
@@ -78,15 +82,10 @@ const Workspaces = () => {
   return isLoading ? (
     <div>Loading...</div>
   ) : (
-    <div>
+    <>
       <HeaderBar caption={label} title="Repositories" />
-      {/* {selectOptions.length > 1 && (
-        <Select options={selectOptions} onChange={setWorkspace as any} />
-      )} */}
-      <div>
-        <Repositories workspace={value} />
-      </div>
-    </div>
+      <Repositories workspace={value} />
+    </>
   );
 };
 

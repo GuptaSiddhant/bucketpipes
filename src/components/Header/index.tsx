@@ -1,13 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { IconArrowLeft, IconSettings, IconFilter } from "tabler-icons";
+import { Link, useHistory } from "react-router-dom";
+import {
+  IconArrowLeft,
+  IconSettings,
+  IconFilter,
+  IconLogout,
+} from "tabler-icons";
 import { theme, styled } from "../../theme";
+import { useBitbucket } from "../../bitbucket";
+import { IconButton } from "../Misc/IconButton";
 import { ReactComponent as LOGO } from "./logo.svg";
 
 interface HeaderBar {
   title: string;
   caption: string;
-  backLink?: string;
+  allowBack?: boolean;
   action?: object;
 }
 
@@ -20,57 +27,54 @@ const StyledHeaderBar = styled.header<{ actions: number }>`
   background: ${theme.colors.default};
   box-shadow: ${theme.shadows.large};
   padding: 8px 16px;
+  z-index: 100;
 
   display: grid;
-  grid-template-columns: 32px 1fr ${(p) =>
-      p.actions > 0 && `repeat(${p.actions}, 32px)`} 32px;
+  grid-template-columns: max-content 1fr ${(p) =>
+      p.actions >= 0 && `repeat(${p.actions + 1}, max-content)`};
   gap: 16px;
   align-items: center;
 
   #heading {
-    padding: 2px 8px;
+    padding: 4px 0px;
     height: 48px;
+    ${theme.css.truncateText};
+
     #title {
       font: ${theme.fonts.title};
       color: ${theme.colors.primary};
       padding: 4px 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      ${theme.css.truncateText};
     }
     #caption {
       font: ${theme.fonts.subtext};
       color: ${theme.colors.secondary};
-      overflow: hidden;
-      text-overflow: ellipsis;
+      ${theme.css.truncateText};
     }
-  }
-
-  .icon {
-    height: 32px;
-    text-align: center;
-    color: ${theme.colors.secondary};
   }
 `;
 
 const HeaderBar = (props: HeaderBar) => {
-  const { title, caption, backLink, action } = props;
+  const { title, caption, allowBack, action } = props;
+  const { logout } = useBitbucket();
+  const history = useHistory();
+  const backLink = allowBack ? "" : "/";
   return (
     <StyledHeaderBar actions={action ? 1 : 0}>
-      <Link to={backLink || "/"} className="icon">
-        {backLink ? <IconArrowLeft /> : <LOGO title="BucketPipes" />}
-      </Link>
+      {allowBack ? (
+        <IconButton Icon={IconArrowLeft} onClick={history.goBack} />
+      ) : (
+        <Link to={backLink} className="icon">
+          <LOGO title="BucketPipes" />
+        </Link>
+      )}
       <div id="heading">
         <div id="caption">{caption}</div>
         <div id="title">{title}</div>
       </div>
-      {action && (
-        <div className="icon">
-          <IconFilter />
-        </div>
-      )}
-      <div className="icon">
-        <IconSettings />
-      </div>
+      {action && <IconButton Icon={IconFilter} title={"Filter"} />}
+
+      <IconButton Icon={IconLogout} onClick={logout} title={"Logout"} />
     </StyledHeaderBar>
   );
 };
