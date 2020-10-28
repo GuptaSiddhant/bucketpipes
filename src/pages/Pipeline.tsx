@@ -49,15 +49,15 @@ const FAB = () => (
 );
 
 const StepList = () => {
-  const { bitbucket, logout } = useBitbucket();
+  const { bitbucket } = useBitbucket();
   const { repo_slug, workspace, pipeline_uuid } = useParams<Param>();
 
-  const { data: stepsResponse, isError } = usePaginatedQuery<
+  const { data: stepsResponse } = usePaginatedQuery<
     Response<Schema.PaginatedPipelineSteps>
   >(["pipeline_steps", { workspace, repo_slug, pipeline_uuid }], (_, options) =>
     bitbucket.pipelines.listSteps({ ...options, pagelen: 100 })
   );
-  if (isError) logout();
+
   const steps = stepsResponse?.data.values || [];
   return (
     <StyledList>

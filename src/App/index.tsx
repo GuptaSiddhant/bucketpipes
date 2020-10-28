@@ -47,15 +47,16 @@ const Auth = () => {
   }, [defaultState]);
 
   const authenticate = React.useCallback(
-    async (token: string) => {
+    async (token: string, newToken: boolean = false) => {
       const client = new Bitbucket({ auth: { token } });
       const { status, data } = await client.users.getAuthedUser({});
       if (status === 200) {
         localStorage.setItem(localStorageTokenKey, token);
-        localStorage.setItem(
-          localStorageTimeKey,
-          new Date().valueOf().toString()
-        );
+        if (newToken)
+          localStorage.setItem(
+            localStorageTimeKey,
+            new Date().valueOf().toString()
+          );
         setState({
           bitbucket: client,
           user: data,
@@ -71,10 +72,9 @@ const Auth = () => {
       localStorage.getItem(localStorageTimeKey) || "0"
     );
     const currentTime = new Date().valueOf();
-    if (currentTime - tokenTime > 3_600_000) {
+    // check for 50mins
+    if (currentTime - tokenTime > 50 * 60 * 1000)
       localStorage.removeItem(localStorageTokenKey);
-      localStorage.removeItem(localStorageTimeKey);
-    }
 
     const localToken = localStorage.getItem(localStorageTokenKey) || "";
     if (localToken !== "") {
@@ -83,7 +83,8 @@ const Auth = () => {
       const params = window.location.hash.split("&");
       if (params.length > 0 && params[0].startsWith("#access_token=")) {
         authenticate(
-          decodeURIComponent(params[0].replace("#access_token=", ""))
+          decodeURIComponent(params[0].replace("#access_token=", "")),
+          true
         );
       }
     }

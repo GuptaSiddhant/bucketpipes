@@ -12,12 +12,12 @@ interface Params {
 }
 
 const RepositoryList = () => {
-  const { bitbucket, logout } = useBitbucket();
+  const { bitbucket } = useBitbucket();
 
   const { workspace } = useParams<Params>();
   const [page] = React.useState(1);
 
-  const { isLoading, data, isError } = usePaginatedQuery<
+  const { isLoading, data } = usePaginatedQuery<
     Response<Schema.PaginatedRepositories>
   >(["repositories", { workspace }, page], (_, options, page = 1) =>
     bitbucket.repositories.list({
@@ -27,7 +27,6 @@ const RepositoryList = () => {
       sort: "-updated_on",
     })
   );
-  if (isError) logout();
 
   const repositories = data?.data?.values || [];
 

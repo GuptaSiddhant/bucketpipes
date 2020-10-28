@@ -18,11 +18,11 @@ interface Params {
 }
 
 const PipelineList = () => {
-  const { bitbucket, logout } = useBitbucket();
+  const { bitbucket } = useBitbucket();
   const [page] = React.useState(1);
 
   const { repo_slug, workspace } = useParams<Params>();
-  const { isLoading, data, isError } = usePaginatedQuery<
+  const { isLoading, data } = usePaginatedQuery<
     Response<Schema.PaginatedPipelines>
   >(["pipelines", { workspace, repo_slug }, page], (_, options, page = 1) =>
     bitbucket.repositories.listPipelines({
@@ -32,7 +32,6 @@ const PipelineList = () => {
       sort: "-created_on",
     })
   );
-  if (isError) logout();
 
   const pipelines = data?.data?.values || [];
 
@@ -48,12 +47,17 @@ const PipelineList = () => {
             avatar: pipeline.creator?.links?.avatar?.href || "",
           };
 
+          const commitHash = ((pipeline.target as any).commit
+              .hash as string).slice(0, 7),
+            branch = (pipeline.target as any).ref_name;
+          const secondaryText = `${branch}${
+            commitHash && ` - ${commitHash}`
+          } - ${creator.name}`;
+
           return {
             uid: pipeline.uuid || index.toString(),
             primaryText: `#${pipeline.build_number} - ${status}`,
-            secondaryText: `${(pipeline.target as any).ref_name} - ${
-              creator.name
-            }`,
+            secondaryText,
             link: `/${pipeline.repository?.full_name}/pipelines/${pipeline.uuid}/`,
             leadingIcon: (
               <IconButton Icon={icon} title={status} color={color} />
