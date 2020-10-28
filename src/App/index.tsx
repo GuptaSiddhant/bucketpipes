@@ -10,7 +10,8 @@ import { Loader } from "../components";
 import Login from "../pages/Login";
 const Router = React.lazy(() => import("./Router"));
 
-const localStorageKey = "bitbucketToken";
+const localStorageTokenKey = "bitbucketToken";
+const localStorageTimeKey = "bitbucketTokenTimestamp";
 
 const queryCache = new QueryCache({
   defaultConfig: {
@@ -39,7 +40,8 @@ const Auth = () => {
   const { user, isAuth, bitbucket } = state;
 
   const logout = React.useCallback(() => {
-    localStorage.removeItem(localStorageKey);
+    localStorage.removeItem(localStorageTokenKey);
+    localStorage.removeItem(localStorageTimeKey);
     setState(defaultState);
     window.location.href = "/";
   }, [defaultState]);
@@ -49,20 +51,32 @@ const Auth = () => {
       const client = new Bitbucket({ auth: { token } });
       const { status, data } = await client.users.getAuthedUser({});
       if (status === 200) {
-        localStorage.setItem(localStorageKey, token);
+        localStorage.setItem(localStorageTokenKey, token);
+        localStorage.setItem(
+          localStorageTimeKey,
+          new Date().valueOf().toString()
+        );
         setState({
           bitbucket: client,
           user: data,
           isAuth: true,
         });
-        // window.location.href = "/";
       } else logout();
     },
     [logout]
   );
 
   React.useEffect(() => {
-    const localToken = localStorage.getItem(localStorageKey) || "";
+    const tokenTime = parseInt(
+      localStorage.getItem(localStorageTimeKey) || "0"
+    );
+    const currentTime = new Date().valueOf();
+    if (currentTime - tokenTime > 3_600_000) {
+      localStorage.removeItem(localStorageTokenKey);
+      localStorage.removeItem(localStorageTimeKey);
+    }
+
+    const localToken = localStorage.getItem(localStorageTokenKey) || "";
     if (localToken !== "") {
       authenticate(localToken);
     } else {

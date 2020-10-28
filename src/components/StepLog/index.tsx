@@ -40,7 +40,7 @@ const Step = ({
   index?: number;
   defaultShowLog?: boolean;
 }) => {
-  const { bitbucket, logout } = useBitbucket();
+  const { bitbucket } = useBitbucket();
   const [showLog, setShowLog] = React.useState(defaultShowLog);
   const { icon, status, color } = getPipelineStatus(step);
   const { repo_slug, workspace, pipeline_uuid } = useParams<{
@@ -49,7 +49,7 @@ const Step = ({
     pipeline_uuid: string;
   }>();
 
-  const { isLoading, data, refetch, isError } = useQuery<Response<ArrayBuffer>>(
+  const { isLoading, data, refetch } = useQuery<Response<ArrayBuffer>>(
     [
       "pipeline_step_log",
       { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
@@ -57,7 +57,6 @@ const Step = ({
     (_, options) => bitbucket.pipelines.getStepLog({ ...options }),
     { enabled: defaultShowLog }
   );
-  if (isError) logout();
 
   const toggleShowLog = React.useCallback(() => setShowLog((val) => !val), []);
   React.useEffect(() => {
