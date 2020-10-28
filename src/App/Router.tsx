@@ -1,19 +1,13 @@
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { useBitbucket } from "../bitbucket";
 import { Response } from "../bitbucket/request/types";
 import { usePaginatedQuery } from "react-query";
 import { Schema } from "../bitbucket/types";
-import Loader from "../pages/Loader";
-const Repositories = lazy(() => import("../pages/Repositories"));
-const Pipelines = lazy(() => import("../pages/Pipelines"));
-const Pipeline = lazy(() => import("../pages/Pipeline"));
 
-const login = () => {
-  const key = "VfZarR4QDMLH8pXVDP",
-    url = `https://bitbucket.org/site/oauth2/authorize?client_id=${key}&response_type=token`;
-  window.location.href = url;
-};
+import Repositories from "../pages/Repositories";
+import Pipelines from "../pages/Pipelines";
+import Pipeline from "../pages/Pipeline";
 
 const Router = () => {
   const { user, bitbucket } = useBitbucket();
@@ -49,17 +43,4 @@ const Router = () => {
   );
 };
 
-export default ({ isAuth }: { isAuth: boolean }) => {
-  if (!isAuth)
-    return (
-      <button onClick={login} className="button">
-        Login
-      </button>
-    );
-  else
-    return (
-      <Suspense fallback={<Loader />}>
-        <Router />
-      </Suspense>
-    );
-};
+export default Router;

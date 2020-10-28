@@ -1,5 +1,5 @@
 import { Schema } from "../../bitbucket/types";
-import { IconButton } from "../Misc/IconButton";
+import { IconButton } from "../Misc/Button";
 import {
   IconCircleCheck,
   IconCircleDashed,

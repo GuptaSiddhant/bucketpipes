@@ -1,18 +1,20 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { usePaginatedQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import * as time from "timeago.js";
-import { HeaderBar, List, Image } from "../components";
+import { HeaderBar, List, Image, Loader } from "../components";
 import { useBitbucket } from "../bitbucket";
 import { Schema } from "../bitbucket/types";
 import { Response } from "../bitbucket/request/types";
 
-const Repositories = () => {
+interface Params {
+  workspace: string;
+}
+
+const RepositoryList = () => {
   const { bitbucket } = useBitbucket();
 
-  const { workspace } = useParams<{
-    workspace: string;
-  }>();
+  const { workspace } = useParams<Params>();
   const [page] = React.useState(1);
 
   const { isLoading, data } = usePaginatedQuery<
@@ -44,10 +46,17 @@ const Repositories = () => {
     ),
   }));
 
+  return <List items={items} isLoading={isLoading} />;
+};
+
+const Repositories = () => {
+  const { workspace } = useParams<Params>();
   return (
     <main>
       <HeaderBar title={workspace} caption="Repositories" />
-      <List items={items} isLoading={isLoading} />
+      <Suspense fallback={<Loader />}>
+        <RepositoryList />
+      </Suspense>
     </main>
   );
 };

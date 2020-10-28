@@ -49,14 +49,18 @@ const Step = ({
     pipeline_uuid: string;
   }>();
 
-  const { isLoading, data } = useQuery<Response<ArrayBuffer>>(
+  const { isLoading, data, refetch } = useQuery<Response<ArrayBuffer>>(
     [
       "pipeline_step_log",
       { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
     ],
-    (_, options) => bitbucket.pipelines.getStepLog({ ...options })
+    (_, options) => bitbucket.pipelines.getStepLog({ ...options }),
+    { enabled: defaultShowLog }
   );
   const toggleShowLog = React.useCallback(() => setShowLog((val) => !val), []);
+  React.useEffect(() => {
+    if (showLog) refetch();
+  }, [showLog, refetch]);
 
   const log = new TextDecoder("utf-8").decode(data?.data);
 

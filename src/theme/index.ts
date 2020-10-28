@@ -1,3 +1,5 @@
+import styled from "styled-components";
+
 const white = "#FFFFFF",
   black = "#000D1A";
 
@@ -18,7 +20,7 @@ const colors = {
 
 const shadows = {
   none: `none`,
-  large: `0 4px 16px 0 rgba(0,0,0,0.10)`,
+  large: `0 4px 16px 0 rgba(0,0,0,0.20)`,
   medium: `0 2px 8px 0 rgba(0,0,0,0.20)`,
   small: `0 1px 4px 0 rgba(0,0,0,0.20)`,
 } as const;
@@ -36,11 +38,20 @@ const css = {
   truncateText: `max-width: calc(100%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`,
 } as const;
 
-export const theme = {
+const theme = {
   colors,
   shadows,
   fonts,
   css,
 } as const;
 
-export { default as styled } from "styled-components";
+const Center = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+
+export { styled, theme, Center };

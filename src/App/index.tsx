@@ -1,10 +1,14 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { QueryCache, ReactQueryCacheProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query-devtools";
 import Router from "./Router";
 import "./index.css";
 import { Bitbucket, Context, BitbucketContext } from "../bitbucket";
 import { APIClient } from "../bitbucket/client/types";
 import { Schema } from "../bitbucket/types";
+
+import { Loader } from "../components";
+import Login from "../pages/Login";
 
 const localStorageKey = "bitbucketToken";
 
@@ -75,8 +79,13 @@ const Auth = () => {
   return (
     <ReactQueryCacheProvider queryCache={queryCache}>
       <Context.Provider value={{ bitbucket, logout, user }}>
-        <Router isAuth={isAuth} />
+        <Suspense fallback={<Loader />}>
+          {isAuth ? <Router /> : <Login />}
+        </Suspense>
       </Context.Provider>
+      {process.env.NODE_ENV !== "production" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </ReactQueryCacheProvider>
   );
 };

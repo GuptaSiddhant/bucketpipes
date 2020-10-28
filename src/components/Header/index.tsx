@@ -8,17 +8,18 @@ import {
 } from "tabler-icons";
 import { theme, styled } from "../../theme";
 import { useBitbucket } from "../../bitbucket";
-import { IconButton } from "../Misc/IconButton";
-import { ReactComponent as LOGO } from "./logo.svg";
+import { IconButton } from "../Misc/Button";
+import { ReactComponent as LOGO } from "../../assets/logo.svg";
 
 interface HeaderBar {
   title: string;
   caption: string;
   allowBack?: boolean;
-  action?: object;
+  actions?: React.ReactNode[];
+  actionOverride?: React.ReactNode;
 }
 
-const StyledHeaderBar = styled.header<{ actions: number }>`
+const StyledHeaderBar = styled.header<{ actionsCount: number }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -31,7 +32,7 @@ const StyledHeaderBar = styled.header<{ actions: number }>`
 
   display: grid;
   grid-template-columns: max-content 1fr ${(p) =>
-      p.actions >= 0 && `repeat(${p.actions + 1}, max-content)`};
+      p.actionsCount >= 0 && `repeat(${p.actionsCount + 1}, max-content)`};
   gap: 16px;
   align-items: center;
 
@@ -55,12 +56,12 @@ const StyledHeaderBar = styled.header<{ actions: number }>`
 `;
 
 const HeaderBar = (props: HeaderBar) => {
-  const { title, caption, allowBack, action } = props;
+  const { title, caption, allowBack, actions = [], actionOverride } = props;
   const { logout } = useBitbucket();
   const history = useHistory();
   const backLink = allowBack ? "" : "/";
   return (
-    <StyledHeaderBar actions={action ? 1 : 0}>
+    <StyledHeaderBar actionsCount={actionOverride ? 0 : actions.length}>
       {allowBack ? (
         <IconButton Icon={IconArrowLeft} onClick={history.goBack} />
       ) : (
@@ -72,9 +73,15 @@ const HeaderBar = (props: HeaderBar) => {
         <div id="caption">{caption}</div>
         <div id="title">{title}</div>
       </div>
-      {action && <IconButton Icon={IconFilter} title={"Filter"} />}
 
-      <IconButton Icon={IconLogout} onClick={logout} title={"Logout"} />
+      {actionOverride || (
+        <>
+          {actions.length > 0 && (
+            <IconButton Icon={IconFilter} title={"Filter"} />
+          )}
+          <IconButton Icon={IconLogout} onClick={logout} title={"Logout"} />
+        </>
+      )}
     </StyledHeaderBar>
   );
 };
