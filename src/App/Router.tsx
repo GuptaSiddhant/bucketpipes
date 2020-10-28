@@ -14,11 +14,16 @@ const Router = () => {
 
   const { data, isError } = usePaginatedQuery<
     Response<Schema.PaginatedWorkspaces>
-  >(["workspaces"], (key) =>
-    bitbucket.workspaces.getWorkspaces({
-      username: user?.uuid,
-      pagelen: 100,
-    })
+  >(
+    ["workspaces"],
+    (key) =>
+      bitbucket.workspaces.getWorkspaces({
+        username: user?.uuid,
+        pagelen: 100,
+      }),
+    {
+      retry: false,
+    }
   );
 
   if (isError) logout();

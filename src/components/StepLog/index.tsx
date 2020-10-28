@@ -31,6 +31,30 @@ const StyledStep = styled.div`
   }
 `;
 
+const Log = ({ step }: { step: Schema.PipelineStep }) => {
+  const { bitbucket } = useBitbucket();
+  const { repo_slug, workspace, pipeline_uuid } = useParams<{
+    repo_slug: string;
+    workspace: string;
+    pipeline_uuid: string;
+  }>();
+
+  const { isLoading, data } = useQuery<Response<ArrayBuffer>>(
+    [
+      "pipeline_step_log",
+      { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
+    ],
+    (_, options) => bitbucket.pipelines.getStepLog({ ...options }),
+    { refetchInterval: 1000 }
+  );
+  const log = new TextDecoder("utf-8").decode(data?.data);
+  return (
+    <pre>
+      {isLoading ? "Loading..." : log || "No logs found for this step."}
+    </pre>
+  );
+};
+
 const Step = ({
   step,
   index = 0,
@@ -40,30 +64,10 @@ const Step = ({
   index?: number;
   defaultShowLog?: boolean;
 }) => {
-  const { bitbucket } = useBitbucket();
   const [showLog, setShowLog] = React.useState(defaultShowLog);
   const { icon, status, color } = getPipelineStatus(step);
-  const { repo_slug, workspace, pipeline_uuid } = useParams<{
-    repo_slug: string;
-    workspace: string;
-    pipeline_uuid: string;
-  }>();
-
-  const { isLoading, data, refetch } = useQuery<Response<ArrayBuffer>>(
-    [
-      "pipeline_step_log",
-      { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
-    ],
-    (_, options) => bitbucket.pipelines.getStepLog({ ...options }),
-    { enabled: defaultShowLog }
-  );
 
   const toggleShowLog = React.useCallback(() => setShowLog((val) => !val), []);
-  React.useEffect(() => {
-    if (showLog) refetch();
-  }, [showLog, refetch]);
-
-  const log = new TextDecoder("utf-8").decode(data?.data);
 
   const item: ListItem = React.useMemo(() => {
     const timeString = () => {
@@ -84,11 +88,7 @@ const Step = ({
   return (
     <StyledStep>
       <ListItem contained {...item} onClick={toggleShowLog} />
-      {showLog && (
-        <pre>
-          {isLoading ? "Loading..." : log || "No logs found for this step."}
-        </pre>
-      )}
+      {showLog && <Log step={step} />}
     </StyledStep>
   );
 };
