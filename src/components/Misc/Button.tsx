@@ -31,15 +31,20 @@ const Styled = styled.button<{ contained?: boolean }>`
       p.contained ? theme.shadows.large : theme.shadows.none};
   }
 
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
   span {
-    margin-left: 8px;
+    margin: 0 8px;
   }
 `;
 
 const IconButton = ({ Icon, color, onClick, title, contained }: IconButton) => {
   return (
     <Styled onClick={onClick} title={title} contained={contained}>
-      <Icon color={color} size={24} stroke={2} />
+      <Icon color={color} size={32} stroke={2} />
     </Styled>
   );
 };

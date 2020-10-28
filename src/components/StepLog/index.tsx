@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { IconCaretDown, IconCaretUp } from "tabler-icons";
@@ -8,6 +8,7 @@ import { Response } from "../../bitbucket/request/types";
 import { ListItem, IconButton } from "../../components";
 import { theme, styled } from "../../theme";
 import { getPipelineStatus } from "./status";
+import { Loader } from "../Misc/Loader";
 
 const StyledStep = styled.div`
   position: relative;
@@ -45,7 +46,7 @@ const Log = ({ step }: { step: Schema.PipelineStep }) => {
       { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
     ],
     (_, options) => bitbucket.pipelines.getStepLog({ ...options }),
-    { refetchInterval: 1000 }
+    { refetchInterval: 1000, suspense: false }
   );
   const log = new TextDecoder("utf-8").decode(data?.data);
   return (
@@ -88,7 +89,11 @@ const Step = ({
   return (
     <StyledStep>
       <ListItem contained {...item} onClick={toggleShowLog} />
-      {showLog && <Log step={step} />}
+      {showLog && (
+        <Suspense fallback={<Loader />}>
+          <Log step={step} />
+        </Suspense>
+      )}
     </StyledStep>
   );
 };

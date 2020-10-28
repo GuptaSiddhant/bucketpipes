@@ -9,6 +9,7 @@ const Styled = styled.main`
   align-items: center;
   width: 100vw;
   height: 100vh;
+  margin: 0;
 
   .loading {
     animation: spin infinite 3s linear;
