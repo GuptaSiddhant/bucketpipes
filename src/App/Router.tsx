@@ -10,9 +10,9 @@ import Pipelines from "../pages/Pipelines";
 import Pipeline from "../pages/Pipeline";
 
 const Router = () => {
-  const { user, bitbucket } = useBitbucket();
+  const { user, bitbucket, logout } = useBitbucket();
 
-  const { isLoading, data } = usePaginatedQuery<
+  const { data, isError } = usePaginatedQuery<
     Response<Schema.PaginatedWorkspaces>
   >(["workspaces"], (key) =>
     bitbucket.workspaces.getWorkspaces({
@@ -20,7 +20,8 @@ const Router = () => {
       pagelen: 100,
     })
   );
-  if (isLoading) return <div> Loading...</div>;
+
+  if (isError) logout();
 
   const workspaces = data?.data.values || [{ name: "" }];
   const workspace = workspaces[0].name;
@@ -37,7 +38,7 @@ const Router = () => {
         <Repositories />
       </Route>
       <Route path="/">
-        <Redirect to={"/" + workspace + "/"} />
+        <Redirect to={"/" + workspace} />
       </Route>
     </Switch>
   );

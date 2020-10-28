@@ -18,20 +18,21 @@ interface Params {
 }
 
 const PipelineList = () => {
-  const { bitbucket } = useBitbucket();
+  const { bitbucket, logout } = useBitbucket();
   const [page] = React.useState(1);
 
   const { repo_slug, workspace } = useParams<Params>();
-  const { isLoading, data } = usePaginatedQuery<
+  const { isLoading, data, isError } = usePaginatedQuery<
     Response<Schema.PaginatedPipelines>
   >(["pipelines", { workspace, repo_slug }, page], (_, options, page = 1) =>
     bitbucket.repositories.listPipelines({
       ...options,
       page,
-      pagelen: 200,
+      pagelen: 100,
       sort: "-created_on",
     })
   );
+  if (isError) logout();
 
   const pipelines = data?.data?.values || [];
 

@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import { QueryCache, ReactQueryCacheProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query-devtools";
-import Router from "./Router";
 import "./index.css";
 import { Bitbucket, Context, BitbucketContext } from "../bitbucket";
 import { APIClient } from "../bitbucket/client/types";
@@ -9,13 +8,13 @@ import { Schema } from "../bitbucket/types";
 
 import { Loader } from "../components";
 import Login from "../pages/Login";
+const Router = React.lazy(() => import("./Router"));
 
 const localStorageKey = "bitbucketToken";
 
 const queryCache = new QueryCache({
   defaultConfig: {
     queries: {
-      retry: 0,
       suspense: true,
     },
   },

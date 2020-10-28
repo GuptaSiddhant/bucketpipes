@@ -49,14 +49,15 @@ const FAB = () => (
 );
 
 const StepList = () => {
-  const { bitbucket } = useBitbucket();
+  const { bitbucket, logout } = useBitbucket();
   const { repo_slug, workspace, pipeline_uuid } = useParams<Param>();
 
-  const { data: stepsResponse } = usePaginatedQuery<
+  const { data: stepsResponse, isError } = usePaginatedQuery<
     Response<Schema.PaginatedPipelineSteps>
   >(["pipeline_steps", { workspace, repo_slug, pipeline_uuid }], (_, options) =>
     bitbucket.pipelines.listSteps({ ...options, pagelen: 100 })
   );
+  if (isError) logout();
   const steps = stepsResponse?.data.values || [];
   return (
     <StyledList>
@@ -73,13 +74,14 @@ const StepList = () => {
 };
 
 const Pipeline = () => {
-  const { bitbucket } = useBitbucket();
+  const { bitbucket, logout } = useBitbucket();
   const { repo_slug, workspace, pipeline_uuid } = useParams<Param>();
-  const { data: pipelineResponse } = useQuery<Response<Schema.Pipeline>>(
-    ["pipeline", { workspace, repo_slug, pipeline_uuid }],
-    (_, options) =>
-      bitbucket.pipelines.get({ ...options, fields: "build_number,uuid" })
+  const { data: pipelineResponse, isError } = useQuery<
+    Response<Schema.Pipeline>
+  >(["pipeline", { workspace, repo_slug, pipeline_uuid }], (_, options) =>
+    bitbucket.pipelines.get({ ...options, fields: "build_number,uuid" })
   );
+  if (isError) logout();
   const pipeline = pipelineResponse?.data;
 
   if (!pipeline) return null;
