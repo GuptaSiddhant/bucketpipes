@@ -1,28 +1,25 @@
 import React from "react";
 import { usePaginatedQuery } from "react-query";
+import { useParams } from "react-router-dom";
 import * as time from "timeago.js";
 import { HeaderBar, List, Image } from "../components";
 import { useBitbucket } from "../bitbucket";
 import { Schema } from "../bitbucket/types";
+import { Response } from "../bitbucket/request/types";
 
-interface Response<T> {
-  data: T;
-}
-
-type SelectOption = {
-  label: string;
-  value: string;
-};
-
-const Repositories = ({ workspace }: { workspace: string }) => {
+const Repositories = () => {
   const { bitbucket } = useBitbucket();
+
+  const { workspace } = useParams<{
+    workspace: string;
+  }>();
   const [page] = React.useState(1);
 
   const { isLoading, data } = usePaginatedQuery<
     Response<Schema.PaginatedRepositories>
-  >(["repositories", workspace, page], (key, workspace, page = 1) =>
+  >(["repositories", { workspace }, page], (_, options, page = 1) =>
     bitbucket.repositories.list({
-      workspace,
+      ...options,
       page,
       pagelen: 50,
       sort: "-updated_on",
@@ -47,46 +44,12 @@ const Repositories = ({ workspace }: { workspace: string }) => {
     ),
   }));
 
-  return <List items={items} isLoading={isLoading} />;
-};
-
-const Workspaces = () => {
-  const { user, bitbucket } = useBitbucket();
-  const [{ label, value }, setWorkspace] = React.useState<SelectOption>({
-    label: "",
-    value: "",
-  });
-
-  const { isLoading, data } = usePaginatedQuery<
-    Response<Schema.PaginatedWorkspaces>
-  >(["workspaces"], (key) =>
-    bitbucket.workspaces.getWorkspaces({
-      username: user?.uuid,
-      pagelen: 100,
-    })
-  );
-
-  const selectOptions: SelectOption[] = React.useMemo(
-    () =>
-      (data?.data.values || []).map(({ name, uuid }) => ({
-        label: name || "",
-        value: uuid || "",
-      })),
-    [data]
-  );
-
-  React.useEffect(() => {
-    if (selectOptions.length > 0) setWorkspace(selectOptions[0]);
-  }, [selectOptions]);
-
-  return isLoading ? (
-    <div>Loading...</div>
-  ) : (
-    <>
-      <HeaderBar caption={label} title="Repositories" />
-      <Repositories workspace={value} />
-    </>
+  return (
+    <main>
+      <HeaderBar title={workspace} caption="Repositories" />
+      <List items={items} isLoading={isLoading} />
+    </main>
   );
 };
 
-export default Workspaces;
+export default Repositories;

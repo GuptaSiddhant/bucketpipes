@@ -32,7 +32,7 @@ const IconButton = ({ Icon, color, onClick, title, contained }: IconButton) => {
         background: contained ? theme.colors.default : theme.colors.none,
       }}
     >
-      <Icon color={color} />
+      <Icon color={color} size={32} stroke={2} />
     </Styled>
   );
 };

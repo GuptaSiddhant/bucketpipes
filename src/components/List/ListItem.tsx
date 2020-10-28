@@ -11,11 +11,12 @@ interface ListItem {
   isActive?: boolean;
   link?: string;
   contained?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
 }
 
 const StyledListItem = styled.li`
   border-radius: 4px;
-  background: ${theme.colors.none};
+  background-color: ${theme.colors.none};
   padding: 8px;
   display: grid;
   grid-template-columns: max-content 1fr max-content;
@@ -24,10 +25,6 @@ const StyledListItem = styled.li`
   border-bottom: 1px solid ${theme.colors.hover};
   margin-bottom: 4px;
   overflow: hidden;
-
-  :hover {
-    background: ${theme.colors.hover};
-  }
 
   .leading {
     width: 32px;
@@ -49,6 +46,10 @@ const StyledListItem = styled.li`
       ${theme.css.truncateText};
     }
   }
+
+  :hover {
+    background-color: ${theme.colors.hover} !important;
+  }
 `;
 
 const ListItem = (props: ListItem) => {
@@ -59,9 +60,11 @@ const ListItem = (props: ListItem) => {
     primaryText,
     secondaryText,
     link,
+    onClick,
   } = props;
   const item = (
     <StyledListItem
+      onClick={onClick}
       style={{
         background: contained ? theme.colors.default : theme.colors.none,
         boxShadow: contained ? theme.shadows.medium : theme.shadows.none,

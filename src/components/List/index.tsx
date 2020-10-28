@@ -3,8 +3,9 @@ import { styled } from "../../theme";
 import { ListItem } from "./ListItem";
 
 interface List {
-  isLoading?: boolean;
   items: ListItem[];
+  isLoading?: boolean;
+  emptyListFallback?: React.ReactNode;
 }
 
 const StyledList = styled.ul`
@@ -14,8 +15,9 @@ const StyledList = styled.ul`
 `;
 
 const List = (props: List) => {
-  const { items, isLoading } = props;
+  const { items, isLoading, emptyListFallback = "No items found." } = props;
   if (isLoading) return <div>Loading...</div>;
+  if (items.length < 1) return <div>{emptyListFallback}</div>;
   return (
     <StyledList>
       {items.map((item) => (

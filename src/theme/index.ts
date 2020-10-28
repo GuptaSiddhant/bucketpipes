@@ -10,17 +10,18 @@ const colors = {
   warning: "#FF9800",
   note: "#9C27B0",
   hover: "#F0F4F7",
+  disabled: "#808080",
   default: white,
   inverse: black,
   none: "transparent",
-};
+} as const;
 
 const shadows = {
   none: `none`,
   large: `0 4px 16px 0 rgba(0,0,0,0.10)`,
   medium: `0 2px 8px 0 rgba(0,0,0,0.20)`,
   small: `0 1px 4px 0 rgba(0,0,0,0.20)`,
-};
+} as const;
 
 const fonts = {
   body: `400 16px/20px Metropolis`,
@@ -29,17 +30,17 @@ const fonts = {
   subtext: `500 14px/16px Metropolis`,
   title: `500 20px/24px Metropolis`,
   code: `400 12px/16px FiraCode`,
-};
+} as const;
 
 const css = {
   truncateText: `max-width: calc(100%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`,
-};
+} as const;
 
 export const theme = {
   colors,
   shadows,
   fonts,
   css,
-};
+} as const;
 
 export { default as styled } from "styled-components";

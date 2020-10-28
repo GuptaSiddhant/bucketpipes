@@ -3,13 +3,11 @@ import { useQuery, usePaginatedQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { useBitbucket } from "../bitbucket";
 import { Schema } from "../bitbucket/types";
+import { Response } from "../bitbucket/request/types";
 import { HeaderBar, StyledList, IconButton, Step } from "../components";
 import { styled } from "../theme";
 import { IconArrowUpCircle, IconArrowDownCircle } from "tabler-icons";
 
-interface Response<T> {
-  data: T;
-}
 const StyledFab = styled.div`
   position: fixed;
   bottom: 16px;
@@ -54,30 +52,20 @@ const Pipeline = () => {
   }>();
 
   const { data: pipelineResponse } = useQuery<Response<Schema.Pipeline>>(
-    ["pipeline " + pipeline_uuid],
-    () =>
-      bitbucket.pipelines.get({
-        workspace,
-        pipeline_uuid,
-        repo_slug,
-      })
+    ["pipeline", { workspace, repo_slug, pipeline_uuid }],
+    (_, options) => bitbucket.pipelines.get({ ...options })
   );
   const { data: stepsResponse } = usePaginatedQuery<
     Response<Schema.PaginatedPipelineSteps>
-  >(["pipeline steps " + pipeline_uuid], () =>
-    bitbucket.pipelines.listSteps({
-      workspace,
-      pipeline_uuid,
-      repo_slug,
-      pagelen: 100,
-    })
+  >(["pipeline_steps", { workspace, repo_slug, pipeline_uuid }], (_, options) =>
+    bitbucket.pipelines.listSteps({ ...options, pagelen: 100 })
   );
   const pipeline = pipelineResponse?.data;
   const steps = stepsResponse?.data.values;
 
   if (!pipeline) return null;
   return (
-    <>
+    <main>
       <StyledList>
         {(steps || []).map((step, index, array) => (
           <Step
@@ -94,7 +82,7 @@ const Pipeline = () => {
         allowBack
       />
       <FAB />
-    </>
+    </main>
   );
 };
 
