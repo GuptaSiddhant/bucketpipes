@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { usePaginatedQuery } from "react-query";
+import { useInfiniteQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { useBitbucket } from "../bitbucket";
 import { Schema } from "../bitbucket/types";
@@ -10,7 +10,9 @@ import {
   IconButton,
   getPipelineStatus,
   Loader,
+  Button,
 } from "../components";
+import { Icon2fa } from "tabler-icons";
 
 interface Params {
   repo_slug: string;
@@ -19,24 +21,35 @@ interface Params {
 
 const PipelineList = () => {
   const { bitbucket } = useBitbucket();
-  const [page] = React.useState(1);
 
-  const { repo_slug, workspace } = useParams<Params>();
-  const { isLoading, data } = usePaginatedQuery<
-    Response<Schema.PaginatedPipelines>
-  >(["pipelines", { workspace, repo_slug }, page], (_, options, page = 1) =>
-    bitbucket.repositories.listPipelines({
-      ...options,
-      page,
-      pagelen: 100,
-      sort: "-created_on",
-    })
+  const options = useParams<Params>();
+
+  const {
+    isLoading,
+    data = [],
+    canFetchMore,
+    fetchMore,
+    isFetchingMore,
+  } = useInfiniteQuery<Response<Schema.PaginatedPipelines>>(
+    ["pipelines", options],
+    (_, options, page = 1) =>
+      bitbucket.repositories.listPipelines({
+        ...options,
+        page,
+        pagelen: 5,
+        sort: "-created_on",
+      }),
+    {
+      getFetchMore: ({ data: { size = 0, pagelen = 0, page = 0 } }) => page + 1,
+    }
   );
 
-  const pipelines = data?.data?.values || [];
-
-  const items: List["items"] =
-    pipelines.length > 0
+  const items: List["items"] = React.useMemo(() => {
+    const pipelines = data.reduce(
+      (acc, group) => [...acc, ...group.data.values],
+      [] as Schema.Pipeline[]
+    );
+    return pipelines.length > 0
       ? pipelines.map((pipeline, index) => {
           const { icon, status, color } = getPipelineStatus(pipeline);
           const creator = {
@@ -66,13 +79,23 @@ const PipelineList = () => {
           };
         })
       : [];
+  }, [data]);
 
   return (
-    <List
-      items={items}
-      isLoading={isLoading}
-      emptyListFallback="Pipelines are not available for this repository."
-    />
+    <>
+      <List
+        items={items}
+        isLoading={isLoading}
+        emptyListFallback="Pipelines are not available for this repository."
+      />
+      {canFetchMore && (
+        <Button
+          title={isFetchingMore ? "Loading..." : "Load more"}
+          Icon={Icon2fa}
+          onClick={fetchMore}
+        />
+      )}
+    </>
   );
 };
 

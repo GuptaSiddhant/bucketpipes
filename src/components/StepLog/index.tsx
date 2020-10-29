@@ -9,7 +9,6 @@ import { ListItem, IconButton } from "../../components";
 import { theme, styled } from "../../theme";
 import { getPipelineStatus } from "./status";
 import { Loader } from "../Misc/Loader";
-import { ifError } from "assert";
 
 interface Param {
   repo_slug: string;
@@ -47,7 +46,7 @@ const Log = ({ step }: { step: Schema.PipelineStep }) => {
     pipeline_uuid: string;
   }>();
   const { continueFetch } = getPipelineStatus(step);
-  const { isLoading, data, isError } = useQuery<Response<ArrayBuffer>>(
+  const { isLoading, data } = useQuery<Response<ArrayBuffer>>(
     [
       "pipeline_step_log",
       { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
@@ -91,7 +90,7 @@ const Step = ({
   );
   React.useEffect(() => {
     setStep(data?.data || initStep);
-  }, [data?.data]);
+  }, [data, initStep]);
 
   const item: ListItem = React.useMemo(() => {
     const timeString = () => {
