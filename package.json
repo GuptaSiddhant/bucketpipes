@@ -24,6 +24,7 @@
     "node-fetch": "^2.6.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "react-intersection-observer": "^8.29.1",
     "react-query": "^2.23.1",
     "react-query-devtools": "^2.6.0",
     "react-router-dom": "^5.2.0",

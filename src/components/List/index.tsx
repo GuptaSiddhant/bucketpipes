@@ -1,5 +1,6 @@
 import React from "react";
 import { IconDotsCircleHorizontal, IconLoader } from "tabler-icons";
+import { useInView } from "react-intersection-observer";
 import { useQuery } from "react-query";
 
 import { styled } from "../../theme";
@@ -59,12 +60,13 @@ export const InfiniteList = <Paginated extends Schema.Paginated, T = Paginated>(
     fetchSort = "",
     itemBuilder,
   } = props;
-  const pagelen = 50;
-  const [total, setTotal] = React.useState(0);
+  const pagelen = 100;
+
+  const [total, setTotal] = React.useState(100);
   const [items, setItems] = React.useState<ListItem[]>([]);
   const [page, setPage] = React.useState(1);
   const canFetchMore = total > pagelen * page;
-  const fetchMore = () => setPage((prev) => prev + 1);
+  const fetchMore = React.useCallback(() => setPage((prev) => prev + 1), []);
 
   const { isLoading, data, isFetching } = useQuery<Response<Paginated>>(
     [uuid, fetchParams, page],
@@ -83,9 +85,24 @@ export const InfiniteList = <Paginated extends Schema.Paginated, T = Paginated>(
     if (data) {
       const { size, values } = data.data;
       setTotal(size || 0);
-      setItems((prev) => [...prev, ...(values || []).map(itemBuilder)]);
+      setItems((prevItems) => {
+        const resItems: ListItem[] = [...prevItems];
+        const newItems: ListItem[] = (values || []).map(itemBuilder);
+        newItems.forEach((item) => {
+          const index = resItems.findIndex((i) => i.uid === item.uid);
+          if (index >= 0) resItems[index] = item;
+          else resItems.push(item);
+        });
+        console.log(resItems.length);
+        return resItems;
+      });
     }
   }, [data, itemBuilder]);
+
+  const { ref, inView } = useInView();
+  React.useEffect(() => {
+    if (inView && !isFetching) fetchMore();
+  }, [inView, fetchMore, isFetching]);
 
   return (
     <main>
@@ -94,8 +111,10 @@ export const InfiniteList = <Paginated extends Schema.Paginated, T = Paginated>(
         isLoading={isLoading}
         emptyListFallback="Pipelines are not available for this repository."
       />
+      <ScrollFAB />
       {canFetchMore && (
         <Button
+          ref={ref}
           title={isFetching ? "Loading..." : "Load more"}
           Icon={isFetching ? IconLoader : IconDotsCircleHorizontal}
           onClick={fetchMore}
@@ -104,7 +123,6 @@ export const InfiniteList = <Paginated extends Schema.Paginated, T = Paginated>(
           style={{ width: "100%" }}
         />
       )}
-      <ScrollFAB />
     </main>
   );
 };
