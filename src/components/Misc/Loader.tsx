@@ -10,6 +10,7 @@ const Styled = styled.main`
   width: 100vw;
   height: 100vh;
   margin: 0;
+  padding: 0;
 
   .loading {
     animation: spin infinite 3s linear;

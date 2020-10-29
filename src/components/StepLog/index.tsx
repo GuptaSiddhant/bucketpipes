@@ -9,6 +9,13 @@ import { ListItem, IconButton } from "../../components";
 import { theme, styled } from "../../theme";
 import { getPipelineStatus } from "./status";
 import { Loader } from "../Misc/Loader";
+import { ifError } from "assert";
+
+interface Param {
+  repo_slug: string;
+  workspace: string;
+  pipeline_uuid: string;
+}
 
 const StyledStep = styled.div`
   position: relative;
@@ -39,16 +46,17 @@ const Log = ({ step }: { step: Schema.PipelineStep }) => {
     workspace: string;
     pipeline_uuid: string;
   }>();
-
-  const { isLoading, data } = useQuery<Response<ArrayBuffer>>(
+  const { continueFetch } = getPipelineStatus(step);
+  const { isLoading, data, isError } = useQuery<Response<ArrayBuffer>>(
     [
       "pipeline_step_log",
       { workspace, repo_slug, pipeline_uuid, step_uuid: step.uuid },
     ],
-    (_, options) => bitbucket.pipelines.getStepLog({ ...options }),
-    { refetchInterval: 1000, suspense: false }
+    (_, options) => bitbucket.repositories.getPipelineStepLog({ ...options }),
+    { refetchInterval: continueFetch ? 1000 : false, suspense: false }
   );
-  const log = new TextDecoder("utf-8").decode(data?.data);
+  const dec = new TextDecoder("utf-8");
+  const log = dec.decode(data?.data);
   return (
     <pre>
       {isLoading ? "Loading..." : log || "No logs found for this step."}
@@ -57,7 +65,7 @@ const Log = ({ step }: { step: Schema.PipelineStep }) => {
 };
 
 const Step = ({
-  step,
+  step: initStep,
   index = 0,
   defaultShowLog = false,
 }: {
@@ -65,10 +73,25 @@ const Step = ({
   index?: number;
   defaultShowLog?: boolean;
 }) => {
-  const [showLog, setShowLog] = React.useState(defaultShowLog);
-  const { icon, status, color } = getPipelineStatus(step);
+  const { bitbucket } = useBitbucket();
+  const { repo_slug, workspace, pipeline_uuid } = useParams<Param>();
 
+  const [showLog, setShowLog] = React.useState(defaultShowLog);
   const toggleShowLog = React.useCallback(() => setShowLog((val) => !val), []);
+
+  const [step, setStep] = React.useState(initStep);
+  const { icon, status, color, continueFetch } = getPipelineStatus(step);
+  const { data } = useQuery<Response<Schema.PipelineStep>>(
+    [
+      "pipeline_step",
+      { workspace, repo_slug, pipeline_uuid, step_uuid: initStep.uuid },
+    ],
+    (_, options) => bitbucket.pipelines.getStep({ ...options }),
+    { refetchInterval: continueFetch ? 1000 : false }
+  );
+  React.useEffect(() => {
+    setStep(data?.data || initStep);
+  }, [data?.data]);
 
   const item: ListItem = React.useMemo(() => {
     const timeString = () => {

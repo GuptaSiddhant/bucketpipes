@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useQuery, usePaginatedQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { useBitbucket } from "../bitbucket";
@@ -63,12 +63,14 @@ const StepList = () => {
   return (
     <StyledList>
       {steps.map((step, index, array) => (
-        <Step
-          step={step}
-          key={step.uuid}
-          index={index + 1}
-          defaultShowLog={array.length === 1}
-        />
+        <Suspense key={step.uuid} fallback={<Loader />}>
+          <Step
+            step={step}
+            key={step.uuid}
+            index={index + 1}
+            defaultShowLog={array.length === 1}
+          />
+        </Suspense>
       ))}
     </StyledList>
   );
@@ -87,17 +89,19 @@ const Pipeline = () => {
 
   if (!pipeline) return null;
   return (
-    <main>
-      <React.Suspense fallback={<Loader />}>
-        <StepList />
-      </React.Suspense>
+    <>
       <HeaderBar
         caption={workspace + " / " + repo_slug}
         title={"Pipeline #" + pipeline.build_number?.toString()}
         allowBack
       />
+      <main>
+        <React.Suspense fallback={<Loader />}>
+          <StepList />
+        </React.Suspense>
+      </main>
       <FAB />
-    </main>
+    </>
   );
 };
 

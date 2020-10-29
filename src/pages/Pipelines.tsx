@@ -79,12 +79,14 @@ const PipelineList = () => {
 const Pipelines = () => {
   const { repo_slug } = useParams<Params>();
   return (
-    <main>
-      <HeaderBar title={repo_slug} caption="Pipelines" allowBack />
-      <Suspense fallback={<Loader />}>
-        <PipelineList />
-      </Suspense>
-    </main>
+    <>
+      <HeaderBar title={repo_slug} caption="PIPELINES" allowBack />
+      <main>
+        <Suspense fallback={<Loader />}>
+          <PipelineList />
+        </Suspense>
+      </main>
+    </>
   );
 };
 

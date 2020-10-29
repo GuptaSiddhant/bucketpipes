@@ -53,12 +53,14 @@ const RepositoryList = () => {
 const Repositories = () => {
   const { workspace } = useParams<Params>();
   return (
-    <main>
-      <HeaderBar title={workspace} caption="Repositories" />
-      <Suspense fallback={<Loader />}>
-        <RepositoryList />
-      </Suspense>
-    </main>
+    <>
+      <HeaderBar title={workspace} caption="REPOSITORIES" />
+      <main>
+        <Suspense fallback={<Loader />}>
+          <RepositoryList />
+        </Suspense>
+      </main>
+    </>
   );
 };
 

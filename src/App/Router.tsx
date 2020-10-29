@@ -16,7 +16,7 @@ const Router = () => {
     Response<Schema.PaginatedWorkspaces>
   >(
     ["workspaces"],
-    (key) =>
+    () =>
       bitbucket.workspaces.getWorkspaces({
         username: user?.uuid,
         pagelen: 100,
@@ -28,8 +28,15 @@ const Router = () => {
 
   if (isError) logout();
 
-  const workspaces = data?.data.values || [{ name: "" }];
-  const workspace = workspaces[0].name;
+  const FAWorkspaceSlug = "fasolutions-ondemand";
+
+  const workspaces =
+    data?.data.values || ([{ name: "", slug: "" }] as Schema.Workspace[]);
+
+  const workspace =
+    workspaces.findIndex((w) => w.slug === FAWorkspaceSlug) > -1
+      ? FAWorkspaceSlug
+      : workspaces[0].slug;
 
   return (
     <Switch>

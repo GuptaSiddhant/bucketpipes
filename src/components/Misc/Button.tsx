@@ -13,6 +13,7 @@ interface IconButton {
 const Styled = styled.button<{ contained?: boolean }>`
   border-radius: 4px;
   border: none;
+  padding: 0;
   height: 32px;
   width: 32px;
   color: ${theme.colors.secondary};
@@ -44,7 +45,7 @@ const Styled = styled.button<{ contained?: boolean }>`
 const IconButton = ({ Icon, color, onClick, title, contained }: IconButton) => {
   return (
     <Styled onClick={onClick} title={title} contained={contained}>
-      <Icon color={color} size={32} stroke={2} />
+      <Icon color={color} size={24} />
     </Styled>
   );
 };
@@ -55,9 +56,9 @@ const Button = ({ Icon, color, onClick, title, contained }: IconButton) => {
       onClick={onClick}
       title={title}
       contained={contained}
-      style={{ width: "auto" }}
+      style={{ width: "auto", padding: "4px 8px" }}
     >
-      <Icon color={color} size={24} stroke={2} />
+      <Icon color={color} size={24} />
       <span>{title || "Button"}</span>
     </Styled>
   );

@@ -17,7 +17,8 @@ const getPipelineStatus = ({
 }: Schema.Pipeline | Schema.PipelineStep) => {
   let icon: IconButton["Icon"] = IconCircleDashed,
     status: string = "Ongoing",
-    color: string = "inherit";
+    color: string = "inherit",
+    continueFetch = false;
 
   if (!!state?.name)
     switch (state.name.toUpperCase()) {
@@ -28,6 +29,7 @@ const getPipelineStatus = ({
             icon = IconCircle;
             status = "Pending";
             color = theme.colors.note;
+            continueFetch = true;
             break;
           case "HALTED":
             icon = IconCircleMinus;
@@ -43,6 +45,7 @@ const getPipelineStatus = ({
             icon = IconCircleDashed;
             status = "Running";
             color = theme.colors.note;
+            continueFetch = true;
             break;
           default:
             status = state.stage.name;
@@ -89,7 +92,7 @@ const getPipelineStatus = ({
         status = state.name;
     }
 
-  return { icon, status, color };
+  return { icon, status, color, continueFetch };
 };
 
 export { getPipelineStatus };
