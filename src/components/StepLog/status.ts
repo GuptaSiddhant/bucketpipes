@@ -39,6 +39,11 @@ const getPipelineStatus = ({
             status = "Paused";
             color = theme.colors.warning;
             break;
+          case "RUNNING":
+            icon = IconCircleDashed;
+            status = "Running";
+            color = theme.colors.note;
+            break;
           default:
             status = state.stage.name;
             color = theme.colors.note;

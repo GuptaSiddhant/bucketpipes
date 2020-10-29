@@ -21,6 +21,7 @@ const StyledFab = styled.div`
   display: grid;
   grid-template-columns: repeat(2, max-content);
   gap: 16px;
+  z-index: 10;
 `;
 
 const FAB = () => (
