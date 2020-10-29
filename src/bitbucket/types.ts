@@ -1075,6 +1075,13 @@ export namespace Schema {
     total?: number;
     type?: string;
   }
+
+  export interface Paginated {
+    page?: number;
+    pagelen?: number;
+    size?: number;
+    values?: any[];
+  }
   export interface PaginatedAnnotations {
     next?: string;
     page?: number;

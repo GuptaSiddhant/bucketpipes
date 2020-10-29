@@ -8,9 +8,11 @@ interface IconButton {
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   title?: string;
   contained?: boolean;
+  disabled?: boolean;
+  style?: React.CSSProperties;
 }
 
-const Styled = styled.button<{ contained?: boolean }>`
+const Styled = styled.button<{ contained?: boolean; disabled?: boolean }>`
   border-radius: 4px;
   border: none;
   padding: 0;
@@ -21,15 +23,19 @@ const Styled = styled.button<{ contained?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: ${(p) => (p.disabled ? "inherit" : `pointer`)};
   box-shadow: ${(p) =>
-    p.contained ? theme.shadows.medium : theme.shadows.none};
+    p.contained && !p.disabled ? theme.shadows.medium : theme.shadows.none};
   background: ${(p) =>
-    p.contained ? theme.colors.default : theme.colors.none};
+    p.disabled
+      ? theme.colors.disabled
+      : p.contained
+      ? theme.colors.default
+      : theme.colors.none};
 
   :hover {
     box-shadow: ${(p) =>
-      p.contained ? theme.shadows.large : theme.shadows.none};
+      p.contained && !p.disabled ? theme.shadows.large : theme.shadows.none};
   }
 
   svg {
@@ -42,26 +48,44 @@ const Styled = styled.button<{ contained?: boolean }>`
   }
 `;
 
-const IconButton = ({ Icon, color, onClick, title, contained }: IconButton) => {
-  return (
-    <Styled onClick={onClick} title={title} contained={contained}>
-      <Icon color={color} size={24} />
-    </Styled>
-  );
-};
-
-const Button = ({ Icon, color, onClick, title, contained }: IconButton) => {
+const IconButton = ({
+  Icon,
+  color,
+  onClick,
+  title,
+  contained,
+  disabled,
+  style,
+}: IconButton) => {
   return (
     <Styled
       onClick={onClick}
       title={title}
       contained={contained}
-      style={{ width: "auto", padding: "4px 8px" }}
+      disabled={disabled}
+      style={style}
     >
       <Icon color={color} size={24} />
-      <span>{title || "Button"}</span>
     </Styled>
   );
 };
+
+const Button = React.forwardRef<HTMLButtonElement, IconButton>(
+  ({ Icon, color, onClick, title, contained, disabled, style }, ref) => {
+    return (
+      <Styled
+        ref={ref}
+        onClick={onClick}
+        title={title}
+        contained={contained}
+        style={{ width: "auto", padding: "4px 8px", ...style }}
+        disabled={disabled}
+      >
+        <Icon color={color} size={24} />
+        <span>{title || "Button"}</span>
+      </Styled>
+    );
+  }
+);
 
 export { IconButton, Button };
