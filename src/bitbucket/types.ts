@@ -1,11 +1,145 @@
-import {
-  APIClient as BareAPIClient,
-  Options as BareOptions,
-  Plugin,
-} from "./client/types";
-import { Routes } from "./plugins/register-endpoints/types";
-import { PaginatedResponseData, Response } from "./request/types";
-import { AuthOptions } from "./plugins/auth/types";
+export interface BareOptions {
+  [option: string]: any;
+  baseUrl?: string;
+  request?: RequestOptions["request"];
+}
+
+export abstract class HTTPError extends Error {
+  public error!: any | undefined;
+  public headers!: Headers | undefined;
+  public request!: RequestOptions | undefined;
+  public status!: number;
+}
+
+type HookSingular<O, R, E> = import("before-after-hook").HookSingular<O, R, E>;
+export type RequestHook = HookSingular<
+  RequestOptions,
+  Response<any>,
+  HTTPError
+>;
+
+export interface BareAPIClient {
+  [key: string]: any;
+  request: Request;
+  requestHook: RequestHook;
+}
+
+export type Plugin = (client: BareAPIClient, options: BareOptions) => void;
+
+export interface Response<T> {
+  data: T;
+  headers: Headers & {
+    date?: string;
+    etag?: string;
+    "x-accepted-oauth-scopes"?: string;
+  };
+  status: number;
+  url: string;
+}
+
+export type PaginatedResponseData<T> = Response<T>["data"] & {
+  next?: string;
+  previous?: string;
+};
+
+export interface Request {
+  (endpointRoute: string, endpointOptions?: EndpointParams): Promise<
+    Response<any>
+  >;
+  (endpointOptions: EndpointOptions): Promise<Response<any>>;
+  defaults(endpointOptions: EndpointParams): Request;
+  endpoint: Endpoint;
+}
+
+export type Routes = {
+  [namespace: string]: {
+    [endpoint: string]: {
+      accepts?: string[];
+      alias?: string;
+      deprecated?: boolean;
+      headers?: Headers;
+      method?: RequestMethod;
+      params?: {
+        [param: string]: {
+          enum?: string[];
+          required?: boolean;
+          schema?: string;
+          type: string;
+        };
+      };
+      returns?: string;
+      url?: string;
+    };
+  };
+};
+
+export type Headers = { [header: string]: string };
+
+export type RequestMethod = "DELETE" | "GET" | "POST" | "PUT";
+
+export type EndpointParams = {
+  baseUrl?: string;
+  headers?: Headers;
+  request?: { [option: string]: any };
+  [param: string]: any;
+};
+
+export type EndpointDefaults = EndpointParams & {
+  method: RequestMethod;
+  baseUrl: string;
+  headers: {
+    accept: string;
+    // 'user-agent': string
+  };
+};
+
+export type EndpointOptions = EndpointParams & {
+  method: RequestMethod;
+  url: string;
+};
+
+export type RequestOptions = {
+  method: RequestMethod;
+  url: string;
+  body?: any;
+  headers: EndpointDefaults["headers"] & {
+    authorization?: string;
+  };
+  request?: EndpointParams["request"] & {
+    agent?: any;
+    fetch?: (url: string, init?: any) => Promise<any>;
+    timeout?: number;
+  };
+};
+
+export interface Endpoint {
+  (endpointRoute: string, endpointOptions?: EndpointParams): RequestOptions;
+  (endpointOptions: EndpointOptions): RequestOptions;
+  DEFAULTS: EndpointDefaults;
+  defaults(endpointOptions: EndpointParams): Endpoint;
+  merge(
+    endpointRoute: string,
+    endpointOptions?: EndpointParams
+  ): EndpointDefaults;
+  merge(endpointOptions: EndpointParams): EndpointDefaults;
+  parse(endpointOptions: EndpointDefaults): RequestOptions;
+}
+
+export type AuthBasic = {
+  username: string;
+  password: string;
+};
+
+export type AuthToken = {
+  token: string;
+};
+
+export type AuthOptions = AuthBasic | AuthToken;
+
+export type AuthPluginState = {
+  client: BareAPIClient;
+  auth: AuthOptions;
+};
 
 interface Options extends BareOptions {
   auth?: AuthOptions;

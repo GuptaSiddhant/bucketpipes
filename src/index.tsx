@@ -11,8 +11,7 @@ import {
   useBitbucket,
   BitbucketContext,
 } from "./bitbucket";
-import { APIClient } from "./bitbucket/client/types";
-import { Schema } from "./bitbucket/types";
+import { APIClient, Schema } from "./bitbucket/types";
 
 const localStorageKey = "bitbucketToken";
 
@@ -36,10 +35,6 @@ const Root = () => {
 
   const login = () => {
     const key = "VfZarR4QDMLH8pXVDP",
-      // redirectUrl =
-      //   process.env.NODE_ENV === "development"
-      //     ? "&redirect_url=http://localhost:3000"
-      //     : "",
       url = `https://bitbucket.org/site/oauth2/authorize?client_id=${key}&response_type=token`;
     window.location.href = url;
   };
@@ -109,6 +104,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
-
-export { useBitbucket };
+// serviceWorker.register();
